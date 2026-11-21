@@ -3,21 +3,90 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cover Snap</title>
+<title>Neon Cover Studio</title>
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<main class="app">
-  <section class="controls">
-    <h1>Cover Snap</h1>
-    <p>A photo and a caption, made into a square cover.</p>
-    <label>Photo <input id="photo" type="file" accept="image/*"></label>
-    <label>Caption <input id="caption" type="text" maxlength="40" value="Sunset Heist"></label>
-    <button id="export" type="button">Export PNG 1080 x 1080</button>
-    <p id="status" role="status"></p>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">NC</span><span class="brand-name">Neon Cover Studio</span></div>
+  <div class="sizes" id="size-buttons" role="group" aria-label="Post size">
+    <button type="button" data-size="1080x1080">Square<small>1080×1080</small></button>
+    <button type="button" data-size="1080x1350">Portrait<small>1080×1350</small></button>
+    <button type="button" data-size="1920x1080">Wide<small>1920×1080</small></button>
+  </div>
+  <div class="actions">
+    <button type="button" id="shuffle-crops" class="ghost">Shuffle crops</button>
+    <button type="button" id="export-png" class="export">Export PNG</button>
+  </div>
+</header>
+<main class="studio">
+  <aside class="sidebar">
+    <section class="card">
+      <h2><b>1</b> Photos</h2>
+      <label class="dropzone" id="dropzone">
+        <input id="photo-input" type="file" accept="image/*" multiple>
+        <strong>Drop, paste or pick photos</strong>
+        <span>They stay on your machine.</span>
+      </label>
+      <div class="photo-strip" id="photo-strip"></div>
+      <div class="row-buttons">
+        <button type="button" id="fill-all">One photo, all panels</button>
+        <button type="button" id="spread-photos">Spread across panels</button>
+      </div>
+    </section>
+    <section class="card">
+      <h2><b>2</b> Layout</h2>
+      <div class="layout-grid" id="layout-picker"></div>
+    </section>
+    <section class="card">
+      <h2><b>3</b> Grade</h2>
+      <div class="preset-grid" id="preset-picker"></div>
+      <div class="sliders">
+        <label>Grade <input id="fx-grade" type="range" min="0" max="1" step="0.05"></label>
+        <label>Halftone <input id="fx-halftone" type="range" min="0" max="1" step="0.05"></label>
+        <label>Grain <input id="fx-grain" type="range" min="0" max="1" step="0.05"></label>
+        <label>Ink lines <input id="fx-ink" type="range" min="0" max="1" step="0.05"></label>
+        <label>Vignette <input id="fx-vignette" type="range" min="0" max="1" step="0.05"></label>
+        <label>Gutters <input id="fx-gutter" type="range" min="0.003" max="0.03" step="0.001"></label>
+        <label class="check"><input id="fx-posterize" type="checkbox"> Posterize bands</label>
+      </div>
+    </section>
+  </aside>
+  <section class="stage">
+    <div class="canvas-wrap" id="canvas-wrap">
+      <canvas id="cover-canvas" aria-label="Live cover preview"></canvas>
+      <canvas id="overlay-canvas" aria-hidden="true"></canvas>
+    </div>
+    <p class="hint" id="status" role="status">Click a panel to select it · drag to pan · scroll to zoom · drop a photo on a panel</p>
   </section>
-  <canvas id="cover" width="1080" height="1080" aria-label="The cover"></canvas>
+  <aside class="sidebar right">
+    <section class="card">
+      <h2><b>4</b> Lettering</h2>
+      <label>Caption <input id="text-caption" type="text" maxlength="28"></label>
+      <label>Script line <input id="text-subtitle" type="text" maxlength="28"></label>
+      <label>Tagline <input id="text-tagline" type="text" maxlength="40"></label>
+      <label>Corner note <input id="text-corner" type="text" maxlength="30"></label>
+      <label>Title position
+        <select id="lockup-position">
+          <option value="auto">Bottom / title tile</option>
+          <option value="bottom">Bottom</option>
+          <option value="center">Center</option>
+          <option value="top">Top</option>
+        </select>
+      </label>
+    </section>
+    <section class="card" id="panel-inspector">
+      <h2><b>5</b> Panel <span id="panel-number">1</span></h2>
+      <div class="photo-strip small" id="panel-photo-picker"></div>
+      <label>Zoom <input id="panel-zoom" type="range" min="1" max="4" step="0.01"></label>
+      <div class="row-buttons">
+        <button type="button" id="panel-flip">Flip</button>
+        <button type="button" id="panel-tint">Next tint</button>
+        <button type="button" id="panel-reset">Reset crop</button>
+      </div>
+    </section>
+  </aside>
 </main>
-<script type="module" src="./src/main.js"></script>
+<script type="module" src="./src/studio-editor.js"></script>
 </body>
 </html>
