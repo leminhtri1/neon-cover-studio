@@ -53,7 +53,7 @@ function connect(url) {
   })));
 }
 
-async function withBrowser(width, height, task) {
+export async function withBrowser(width, height, task) {
   const server = spawn(process.execPath, ['serve.ts', '--port', String(APP_PORT)], { stdio: 'ignore' });
   const profile = join(tmpdir(), `ncs-chrome-${Date.now()}`);
   const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${DEBUG_PORT}`, `--user-data-dir=${profile}`,
@@ -141,9 +141,10 @@ async function shrinkImage(inPath, outPath, width, height) {
   });
 }
 
-const [command, a, b, c, d] = process.argv.slice(2);
+const runAsCli = Boolean(process.argv[1]) && process.argv[1].replace(/\\/g, '/').endsWith('capture-shots.mjs');
+const [command, a, b, c, d] = runAsCli ? process.argv.slice(2) : [];
 if (command === 'export') await exportCover(a, b);
 else if (command === 'editor') await captureEditor(a, b, c ? Number(c) : undefined, d ? Number(d) : undefined);
 else if (command === 'shrink') await shrinkImage(a, b, Number(c), Number(d));
-else console.log('usage: export|editor|shrink ...');
-process.exit(0);
+else if (runAsCli) console.log("usage: export|editor|shrink ...");
+if (runAsCli) process.exit(0);

@@ -436,6 +436,8 @@ async function startStudio() {
   fitPreviewToStage();
   refreshControls();
   scheduleRender();
+  // a read-only handle for the maker's smoke test (tools/smoke-test.mjs)
+  window.__studio = { coverDoc, photoLibrary, get selectedPanel() { return selectedPanel; } };
   requestAnimationFrame(() => requestAnimationFrame(() => { window.__studioReady = true; }));
 }
 
