@@ -10,7 +10,7 @@ export const SCREENSHOT_SCENES = {
     layoutId: 'seven-classic', presetId: 'sunset',
     panels: [
       crop(0, 2.2, 0.56, 0.2), crop(1, 1.3, 0.42, 0.38), crop(1, 2.4, 0.42, 0.22),
-      crop(3, 1.2, 0.5, 0.55), crop(0, 1.05, 0.5, 0.42), crop(2, 1.1, 0.5, 0.5), crop(0, 2.2, 0.15, 0.72, { gradeShift: 1 }),
+      crop(3, 1, 0.5, 0.5), crop(0, 1.05, 0.5, 0.42), crop(2, 1.1, 0.5, 0.5), crop(0, 2.1, 0.17, 0.3),
       crop(1, 1, 0.5, 0.5),
     ],
   },
@@ -18,14 +18,14 @@ export const SCREENSHOT_SCENES = {
     layoutId: 'six-stagger', presetId: 'neon-night',
     panels: [
       crop(1, 1.5, 0.4, 0.3), crop(0, 2.4, 0.56, 0.2), crop(3, 1.1, 0.5, 0.5),
-      crop(0, 1.3, 0.3, 0.72), crop(1, 2.6, 0.78, 0.66), crop(0, 1.1, 0.5, 0.35), crop(2, 1, 0.5, 0.5), crop(1, 1, 0.5, 0.5),
+      crop(2, 1.2, 0.5, 0.45), crop(1, 2.6, 0.78, 0.66), crop(0, 1.1, 0.5, 0.35), crop(2, 1, 0.5, 0.5), crop(1, 1, 0.5, 0.5),
     ],
   },
   'pastel-drive': {
     layoutId: 'title-tile-six', presetId: 'miami-pastel',
     panels: [
       crop(0, 2.3, 0.56, 0.2), crop(1, 1.2, 0.45, 0.35), crop(0, 1.6, 0.2, 0.72),
-      crop(1, 2.3, 0.42, 0.22), crop(3, 1.2, 0.5, 0.5), crop(1, 1.1, 0.6, 0.55), crop(0, 1, 0.5, 0.5), crop(1, 1, 0.5, 0.5),
+      crop(1, 2.3, 0.42, 0.22), crop(3, 1.2, 0.5, 0.5), crop(1, 1, 0.45, 0.24), crop(0, 1, 0.5, 0.5), crop(1, 1, 0.5, 0.5),
     ],
   },
 };

@@ -13,8 +13,8 @@ import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 
 const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const APP_PORT = 8123;
-const DEBUG_PORT = 9333;
+const APP_PORT = 8100 + Math.floor(Math.random() * 200);
+const DEBUG_PORT = 9300 + Math.floor(Math.random() * 600);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function waitFor(check, timeout = 30000) {

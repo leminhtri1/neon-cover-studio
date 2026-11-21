@@ -22,33 +22,46 @@ export function drawPalmSilhouette(ctx, x, y, height, lean, color) {
     ctx.lineTo(px(t1), py(t1));
     ctx.stroke();
   }
-  // fronds: drooping leaf blades fanned around the crown
-  const fronds = [-2.9, -2.45, -2.0, -1.55, -1.15, -0.7, -0.25, 0.2];
+  // fronds: arched spines that droop at the tip, feathered with leaflets swept toward the tip
+  const fronds = [-3.0, -2.6, -2.15, -1.75, -1.4, -1.0, -0.55, -0.12];
+  ctx.lineCap = 'round';
   for (const angle of fronds) {
-    const reach = height * (0.42 + 0.1 * Math.cos(angle * 3));
-    const ex = topX + Math.cos(angle) * reach;
-    const ey = topY + Math.sin(angle) * reach * 0.5 + reach * 0.35;
-    const mx = topX + Math.cos(angle) * reach * 0.55;
-    const my = topY + Math.sin(angle) * reach * 0.6 - reach * 0.12;
-    const width = height * 0.06;
-    const steps = 18;
-    const upper = [];
-    const lower = [];
-    for (let i = 0; i <= steps; i++) {
-      const t = i / steps;
-      const qx = (1 - t) * (1 - t) * topX + 2 * (1 - t) * t * mx + t * t * ex;
-      const qy = (1 - t) * (1 - t) * topY + 2 * (1 - t) * t * my + t * t * ey;
-      const half = Math.sin(Math.PI * Math.min(1, t * 1.15)) * width * (1 - t * 0.6);
-      const jag = i % 2 ? 1 : 0.55;
-      upper.push([qx, qy - half * jag]);
-      lower.push([qx, qy + half]);
-    }
+    const reach = height * (0.36 + 0.06 * Math.sin(angle * 5));
+    const dirX = Math.cos(angle);
+    const lift = Math.sin(angle); // negative points up
+    const ex = topX + dirX * reach;
+    const ey = topY + reach * (0.32 + lift * 0.25);
+    const mx = topX + dirX * reach * 0.6;
+    const my = topY + reach * (lift * 0.55 - 0.1);
+    const point = (t) => [
+      (1 - t) * (1 - t) * topX + 2 * (1 - t) * t * mx + t * t * ex,
+      (1 - t) * (1 - t) * topY + 2 * (1 - t) * t * my + t * t * ey,
+    ];
+    ctx.lineWidth = height * 0.012;
     ctx.beginPath();
-    ctx.moveTo(upper[0][0], upper[0][1]);
-    for (const [px, py] of upper) ctx.lineTo(px, py);
-    for (const [px, py] of lower.reverse()) ctx.lineTo(px, py);
-    ctx.closePath();
-    ctx.fill();
+    ctx.moveTo(topX, topY);
+    ctx.quadraticCurveTo(mx, my, ex, ey);
+    ctx.stroke();
+    const steps = 26;
+    ctx.lineWidth = height * 0.0065;
+    ctx.beginPath();
+    for (let i = 2; i < steps; i++) {
+      const t = i / steps;
+      const [px, py] = point(t);
+      const [nx, ny] = point(Math.min(1, t + 0.02));
+      const len = Math.hypot(nx - px, ny - py) || 1;
+      const tx = (nx - px) / len;
+      const ty = (ny - py) / len;
+      const leaf = height * 0.1 * Math.sin(Math.PI * (0.15 + t * 0.85)) * (1 - t * 0.35);
+      for (const side of [-1, 1]) {
+        // leaflets hang: rotate the normal toward the tip and let gravity pull them down
+        const lx = px + (-ty * side * 0.75 + tx * 0.55) * leaf;
+        const ly = py + (tx * side * 0.75 + ty * 0.55) * leaf + leaf * 0.45;
+        ctx.moveTo(px, py);
+        ctx.lineTo(lx, ly);
+      }
+    }
+    ctx.stroke();
   }
   ctx.beginPath();
   ctx.arc(topX, topY, height * 0.03, 0, Math.PI * 2);
@@ -122,44 +135,56 @@ export function paintNeonCityScene(width, height) {
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
-  const sky = ctx.createLinearGradient(0, 0, 0, height);
-  sky.addColorStop(0, '#07021a');
-  sky.addColorStop(0.55, '#3a0f5e');
-  sky.addColorStop(0.7, '#ff4f8a');
-  sky.addColorStop(1, '#16061f');
+  const ground = height * 0.7;
+  const sky = ctx.createLinearGradient(0, 0, 0, ground);
+  sky.addColorStop(0, '#0a0326');
+  sky.addColorStop(0.45, '#4a1470');
+  sky.addColorStop(0.8, '#ff4f8a');
+  sky.addColorStop(1, '#ffb05a');
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, width, height);
+  // a low dusk sun behind the towers
+  ctx.save();
+  ctx.shadowColor = '#ff8a3d';
+  ctx.shadowBlur = width * 0.08;
+  ctx.fillStyle = '#ffe2a0';
+  ctx.beginPath();
+  ctx.arc(width * 0.62, ground - height * 0.08, width * 0.13, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
   let seed = 7;
   const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  const ground = height * 0.7;
+  const unit = width / 90;
   for (let layer = 0; layer < 2; layer++) {
-    let x = -20;
+    let x = -unit * 2;
     while (x < width) {
-      const bw = width * (0.06 + rand() * 0.1);
-      const bh = height * (0.25 + rand() * 0.4) * (layer ? 1 : 0.7);
-      ctx.fillStyle = layer ? '#0b0418' : '#24103f';
+      const bw = width * (0.08 + rand() * 0.1);
+      const bh = height * (0.12 + rand() * 0.3) * (layer ? 1 : 1.25);
+      ctx.fillStyle = layer ? '#12052a' : '#3a1450';
       ctx.fillRect(x, ground - bh, bw, bh);
       if (layer) {
-        for (let wy = ground - bh + 8; wy < ground - 6; wy += 9) {
-          for (let wx = x + 5; wx < x + bw - 6; wx += 8) {
-            if (rand() < 0.4) {
-              ctx.fillStyle = rand() < 0.5 ? '#ffcf7a' : '#7ff0ff';
-              ctx.fillRect(wx, wy, 3, 4);
+        for (let wy = ground - bh + unit * 1.5; wy < ground - unit; wy += unit * 1.7) {
+          for (let wx = x + unit; wx < x + bw - unit; wx += unit * 1.5) {
+            if (rand() < 0.45) {
+              ctx.fillStyle = rand() < 0.6 ? '#ffcf7a' : '#7ff0ff';
+              ctx.fillRect(wx, wy, unit * 0.7, unit * 0.9);
             }
           }
         }
-        if (rand() < 0.6) {
+        if (rand() < 0.7) {
           ctx.save();
-          ctx.shadowBlur = 18;
+          ctx.shadowBlur = unit * 3;
           ctx.shadowColor = ctx.strokeStyle = rand() < 0.5 ? '#ff2fb0' : '#2ff3ff';
-          ctx.lineWidth = 4;
-          ctx.strokeRect(x + bw * 0.15, ground - bh + bh * 0.2, bw * 0.7, height * 0.05);
+          ctx.lineWidth = unit * 0.7;
+          ctx.strokeRect(x + bw * 0.15, ground - bh + bh * 0.12, bw * 0.7, unit * 4);
           ctx.restore();
         }
       }
-      x += bw + (layer ? 4 : -6);
+      x += bw + (layer ? unit * 0.6 : -unit);
     }
   }
+  drawPalmSilhouette(ctx, width * 0.08, ground + height * 0.02, height * 0.6, 0.18, '#0a0218');
+  drawPalmSilhouette(ctx, width * 0.95, ground + height * 0.02, height * 0.5, -0.25, '#0a0218');
   // wet road: mirrored, squashed and darkened copy of the street
   ctx.save();
   ctx.translate(0, ground * 2);
